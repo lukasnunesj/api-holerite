@@ -1,0 +1,6 @@
+@HoleriteAPI.Consumer_HostAddress = http://localhost:5042
+
+GET {{HoleriteAPI.Consumer_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
