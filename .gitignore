@@ -1,0 +1,66 @@
+# Ignorar diretórios de build do .NET
+**/bin/
+**/obj/
+**/out/
+
+# Ignorar arquivos de configuração de usuário
+*.csproj.user
+*.suo
+*.user
+*.cache
+*.log
+*.vspscc
+.vscode/
+.vs/
+
+# Ignorar pacotes NuGet
+packages/
+.nuget/
+
+# Ignorar dependências do Node.js
+node_modules/
+
+# Ignorar arquivos de logs
+*.log
+
+# Ignorar arquivos de backup gerados pelo Visual Studio
+*.bak
+*.swp
+*~
+
+# Ignorar arquivos específicos do sistema operacional
+[Tt]humbs.db
+[Dd]esktop.ini
+ehthumbs.db
+
+# Ignorar diretórios de configuração de IDEs
+.idea/
+.vscode/
+.vs/
+
+# Ignorar arquivos temporários
+tmp/
+temp/
+
+# Ignorar arquivos de publicação do Visual Studio
+*.publishsettings
+.publishprofiles/
+
+# Ignorar arquivos de configuração locais do Docker
+.dockerignore
+
+# Ignorar arquivos de lock do NuGet
+project.lock.json
+project.fragment.lock.json
+
+# Ignorar arquivos de cache do Visual Studio Code
+.vscode/
+
+# Ignorar arquivos de cache do Rider
+.idea/
+
+# Ignorar arquivos de cache do JetBrains Rider
+.idea/
+
+# Ignorar outros arquivos temporários específicos de projeto
+*.tmp
