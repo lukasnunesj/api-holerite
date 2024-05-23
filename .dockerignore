@@ -1,0 +1,39 @@
+# Ignore arquivos e pastas de build do .NET
+**/bin/
+**/obj/
+**/out/
+
+# Ignore arquivos de configuração de usuário
+*.csproj.user
+*.suo
+*.user
+*.cache
+*.log
+*.vspscc
+.vscode/
+.vs/
+
+# Ignore arquivos de dependências locais
+packages/
+.nuget/
+node_modules/
+
+# Ignore arquivos e pastas específicas do sistema operacional
+[Dd]esktop.ini
+[Tt]humbs.db
+ehthumbs.db
+*.swp
+*~
+
+# Ignore arquivos de logs
+*.log
+
+# Ignore pastas de configuração de IDEs
+.idea/
+.vscode/
+.vs/
+
+# Ignore arquivos temporários
+tmp/
+temp/
+
