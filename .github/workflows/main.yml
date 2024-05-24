@@ -9,7 +9,7 @@ jobs:
       - uses: actions/checkout@v2
       - uses: superfly/flyctl-actions/setup-flyctl@master
         with:
-          version: 0.0.462
+          version: 0.2.58
       - run: flyctl deploy --remote-only
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
