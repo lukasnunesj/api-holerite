@@ -8,5 +8,7 @@ namespace HoleriteAPI.Core.Application.DTOs
     public string? HorasExtras100 { get; set; }
     public int DiasUteis { get; set; }
     public int DomingosFeriados { get; set; }
+    public double PlanoMedico { get; set; }
+    public double OutrosDescontos { get; set; }
   }
 }

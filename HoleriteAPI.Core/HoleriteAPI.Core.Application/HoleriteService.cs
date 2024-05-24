@@ -48,15 +48,30 @@ namespace HoleriteAPI.Core.Application
       double totalINSS = CalcularINSS(BaseDeCalculo);
       double totalIRRF = CalcularIRRF(BaseDeCalculo, totalINSS);
 
+      double totalDebitos = BaseDeCalculo;
+      System.Console.WriteLine(holeriteRequestDTO.SalarioBruto);
+      double valorValeAdiantamento = holeriteRequestDTO.SalarioBruto * 0.40;
+      double totalGeral = totalDebitos - valorValeAdiantamento;
+      totalGeral -= holeriteRequestDTO.PlanoMedico;
+      totalGeral -= holeriteRequestDTO.OutrosDescontos;
+      totalGeral -= totalINSS;
+      totalGeral -= totalIRRF;
+
 
       return new HoleriteResponseDTO(
+        double.Round(holeriteRequestDTO.SalarioBruto, 2),
         double.Round(totalINSS, 2),
         double.Round(totalIRRF, 2),
         double.Round(totalAdicionalNoturno, 2),
         double.Round(totalHorasExtras75, 2),
         double.Round(totalHorasExtras100, 2),
         double.Round(totalDSRNoturno, 2),
-        double.Round(totalDSRHoraExtra, 2)
+        double.Round(totalDSRHoraExtra, 2),
+        double.Round(totalDebitos, 2),
+        double.Round(totalGeral, 2),
+        double.Round(holeriteRequestDTO.PlanoMedico, 2),
+        double.Round(holeriteRequestDTO.OutrosDescontos, 2),
+        double.Round(valorValeAdiantamento, 2)
       );
     }
 
@@ -85,7 +100,7 @@ namespace HoleriteAPI.Core.Application
 
     private static double TransformaHoras(string? horario)
     {
-      var partes = horario.Split(':');
+      var partes = horario?.Split(':') ?? ["00", "00"];
       if (partes.Length != 2 || !int.TryParse(partes[0], out int horas) || !int.TryParse(partes[1], out int minutos))
       {
         throw new ArgumentException("Formato de horário inválido. Use o formato HH:mm.", nameof(horario));
