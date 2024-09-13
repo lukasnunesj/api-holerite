@@ -49,7 +49,6 @@ namespace HoleriteAPI.Core.Application
       double totalIRRF = CalcularIRRF(BaseDeCalculo, totalINSS);
 
       double totalDebitos = BaseDeCalculo;
-      System.Console.WriteLine(holeriteRequestDTO.SalarioBruto);
       double valorValeAdiantamento = holeriteRequestDTO.SalarioBruto * 0.40;
       double totalGeral = totalDebitos - valorValeAdiantamento;
       totalGeral -= holeriteRequestDTO.PlanoMedico;
