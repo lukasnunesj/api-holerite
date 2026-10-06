@@ -11,8 +11,8 @@ COPY HoleriteAPI.Core/HoleriteAPI.Core.Domain/HoleriteAPI.Core.Domain.csproj ./H
 COPY HoleriteAPI.Data/HoleriteAPI.Data.csproj ./HoleriteAPI.Data/
 COPY HoleriteAPI.Consumer/HoleriteAPI.Consumer.csproj ./HoleriteAPI.Consumer/
 
-# Restaurar as dependências
-RUN dotnet restore
+# Restaurar as dependências (só da API; o projeto de testes não entra na imagem)
+RUN dotnet restore HoleriteAPI.Consumer/HoleriteAPI.Consumer.csproj
 
 # Copiar todos os arquivos para o contêiner
 COPY . .
