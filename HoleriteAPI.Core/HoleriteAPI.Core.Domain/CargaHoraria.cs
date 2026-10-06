@@ -1,30 +1,19 @@
-
 namespace HoleriteAPI.Core.Domain
 {
-  public class CargaHoraria
+  public static class CargaHoraria
   {
-    public double Base { get; set; }
-    public double TotalHorasExtras { get; set; }
-    public double TotalHorasNoturnas { get; set; }
-    public double Acrescimo { get; set; }
-    public int DiasUteis { get; set; }
-    public int DomingosFeriados { get; set; }
-    public double ValorHoraTrabalho { get; set; }
-    public double ValorHoraNoturna { get; set; }
+    public static decimal ValorHora(decimal salario, decimal horasMensais) => salario / horasMensais;
 
-    public double CalcularHorasExtras()
-    {
-      return ValorHoraTrabalho * Acrescimo * TotalHorasExtras;
-    }
+    /// <summary>Horas extras são pagas por inteiro (hora x acréscimo), pois não estão no salário mensal.</summary>
+    public static decimal HorasExtras(decimal valorHora, decimal acrescimo, decimal horas) =>
+      valorHora * acrescimo * horas;
 
-    public double CalcularDSRHorasExtras()
-    {
-      return (TotalHorasExtras / DiasUteis) * DomingosFeriados;
-    }
+    /// <summary>As horas noturnas já estão no salário; paga-se só o adicional sobre elas.</summary>
+    public static decimal AdicionalNoturno(decimal valorHora, decimal percentual, decimal horas) =>
+      horas * valorHora * percentual;
 
-    public double CalcularAdicionalNoturno()
-    {
-      return TotalHorasNoturnas * ValorHoraNoturna;
-    }
+    /// <summary>Descanso semanal remunerado sobre uma verba variável: (valor / dias úteis) x domingos e feriados.</summary>
+    public static decimal DSR(decimal valor, int diasUteis, int domingosFeriados) =>
+      valor / diasUteis * domingosFeriados;
   }
 }

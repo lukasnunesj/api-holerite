@@ -2,8 +2,8 @@ namespace HoleriteAPI.Core.Domain.Ports
 {
   public interface IHoleriteRepository
   {
-    AliquotaIRRF[] CarregarAliquotasIRRF();
+    IReadOnlyList<FaixaINSS> CarregarFaixasINSS();
 
-    AliquotaINSS[] CarregarAliquotasINSS();
+    TabelaIRRF CarregarTabelaIRRF();
   }
 }

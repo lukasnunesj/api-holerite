@@ -1,33 +1,19 @@
 namespace HoleriteAPI.Core.Application.DTOs
 {
-  public class HoleriteResponseDTO(
-    double salarioBruto,
-    double totalIRRF,
-    double totalINSS,
-    double totalAdicionalNoturno,
-    double totalHorasExtras75,
-    double totalHorasExtras100,
-    double totalDSRNoturno,
-    double totalDSRHoraExtra,
-    double totalDebitos,
-    double totalGeral,
-    double planoMedico,
-    double outrosDescontos,
-    double valorValeAdiantamento
-  )
-  {
-    public double SalarioBruto { get; set; } = salarioBruto;
-    public double TotalIRRF { get; set; } = totalIRRF;
-    public double TotalINSS { get; set; } = totalINSS;
-    public double TotalAdicionalNoturno { get; set; } = totalAdicionalNoturno;
-    public double TotalHorasExtras75 { get; set; } = totalHorasExtras75;
-    public double TotalHorasExtras100 { get; set; } = totalHorasExtras100;
-    public double TotalDSRNoturno { get; set; } = totalDSRNoturno;
-    public double TotalDSRHoraExtra { get; set; } = totalDSRHoraExtra;
-    public double TotalGeral { get; set; } = totalGeral;
-    public double TotalDebitos { get; set; } = totalDebitos;
-    public double PlanoMedico { get; set; } = planoMedico;
-    public double OutrosDescontos { get; set; } = outrosDescontos;
-    public double ValorValeAdiantamento { get; set; } = valorValeAdiantamento;
-  }
+  /// <remarks>TotalDebitos é o total de proventos (base de cálculo do INSS e do IRRF); o nome é mantido por compatibilidade com o front.</remarks>
+  public record HoleriteResponseDTO(
+    decimal SalarioBruto,
+    decimal TotalIRRF,
+    decimal TotalINSS,
+    decimal TotalAdicionalNoturno,
+    decimal TotalHorasExtras75,
+    decimal TotalHorasExtras100,
+    decimal TotalDSRNoturno,
+    decimal TotalDSRHoraExtra,
+    decimal TotalDebitos,
+    decimal TotalGeral,
+    decimal PlanoMedico,
+    decimal OutrosDescontos,
+    decimal ValorValeAdiantamento
+  );
 }

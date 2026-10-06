@@ -5,107 +5,66 @@ using HoleriteAPI.Core.Domain.Ports;
 
 namespace HoleriteAPI.Core.Application
 {
-  public class HoleriteService(IHoleriteRepository IHoleriteRepository) : IHoleriteService
+  public class HoleriteService(IHoleriteRepository repository) : IHoleriteService
   {
-    private readonly IHoleriteRepository _IHoleriteRepository = IHoleriteRepository;
+    // Premissas do caso de uso original (jornada, adicionais e vale). Ver README.
+    private const decimal HorasMensais = 200m;
+    private const decimal PercentualAdicionalNoturno = 0.30m;
+    private const decimal AcrescimoHoraExtra75 = 1.75m;
+    private const decimal AcrescimoHoraExtra100 = 2m;
+    private const decimal PercentualVale = 0.40m;
 
-    public HoleriteResponseDTO CalculaTotais(HoleriteRequestDTO holeriteRequestDTO)
+    public HoleriteResponseDTO CalculaTotais(HoleriteRequestDTO request)
     {
-      CargaHoraria folha = new()
-      {
-        Base = holeriteRequestDTO.SalarioBruto,
-        TotalHorasNoturnas = TransformaHoras(holeriteRequestDTO.HorasNoturnas),
-        ValorHoraTrabalho = holeriteRequestDTO.SalarioBruto / 200,
-      };
-      folha.ValorHoraNoturna = folha.ValorHoraTrabalho * 0.3;
-      double totalAdicionalNoturno = folha.CalcularAdicionalNoturno();
+      decimal valorHora = CargaHoraria.ValorHora(request.SalarioBruto, HorasMensais);
 
-      folha.TotalHorasExtras = TransformaHoras(holeriteRequestDTO.HorasExtras75);
-      folha.Acrescimo = 1.75;
-      double totalHorasExtras75 = folha.CalcularHorasExtras();
+      // Cada verba é arredondada em centavos, como num holerite, antes de somar.
+      decimal adicionalNoturno = Dinheiro.Arredondar(
+        CargaHoraria.AdicionalNoturno(valorHora, PercentualAdicionalNoturno, ParaHoras(request.HorasNoturnas)));
+      decimal horasExtras75 = Dinheiro.Arredondar(
+        CargaHoraria.HorasExtras(valorHora, AcrescimoHoraExtra75, ParaHoras(request.HorasExtras75)));
+      decimal horasExtras100 = Dinheiro.Arredondar(
+        CargaHoraria.HorasExtras(valorHora, AcrescimoHoraExtra100, ParaHoras(request.HorasExtras100)));
+      decimal dsrNoturno = Dinheiro.Arredondar(
+        CargaHoraria.DSR(adicionalNoturno, request.DiasUteis, request.DomingosFeriados));
+      decimal dsrHorasExtras = Dinheiro.Arredondar(
+        CargaHoraria.DSR(horasExtras75 + horasExtras100, request.DiasUteis, request.DomingosFeriados));
 
-      folha.TotalHorasExtras = TransformaHoras(holeriteRequestDTO.HorasExtras100);
-      folha.Acrescimo = 2;
-      double totalHorasExtras100 = folha.CalcularHorasExtras();
+      decimal proventos = request.SalarioBruto + adicionalNoturno + horasExtras75 + horasExtras100 + dsrNoturno + dsrHorasExtras;
 
-      double totalHorasExtras = totalHorasExtras75 + totalHorasExtras100;
+      decimal inss = INSS.Calcular(proventos, repository.CarregarFaixasINSS());
+      decimal irrf = IRRF.Calcular(proventos, inss, repository.CarregarTabelaIRRF());
 
-      double totalDSRNoturno = new CargaHoraria()
-      {
-        TotalHorasExtras = totalAdicionalNoturno,
-        DiasUteis = holeriteRequestDTO.DiasUteis,
-        DomingosFeriados = holeriteRequestDTO.DomingosFeriados
-      }.CalcularDSRHorasExtras();
-
-      double totalDSRHoraExtra = new CargaHoraria()
-      {
-        TotalHorasExtras = totalHorasExtras,
-        DiasUteis = holeriteRequestDTO.DiasUteis,
-        DomingosFeriados = holeriteRequestDTO.DomingosFeriados
-      }.CalcularDSRHorasExtras();
-
-      double BaseDeCalculo = holeriteRequestDTO.SalarioBruto + totalAdicionalNoturno + totalHorasExtras + totalDSRNoturno + totalDSRHoraExtra;
-      double totalINSS = CalcularINSS(BaseDeCalculo);
-      double totalIRRF = CalcularIRRF(BaseDeCalculo, totalINSS);
-
-      double totalDebitos = BaseDeCalculo;
-      double valorValeAdiantamento = holeriteRequestDTO.SalarioBruto * 0.40;
-      double totalGeral = totalDebitos - valorValeAdiantamento;
-      totalGeral -= holeriteRequestDTO.PlanoMedico;
-      totalGeral -= holeriteRequestDTO.OutrosDescontos;
-      totalGeral -= totalINSS;
-      totalGeral -= totalIRRF;
-
+      decimal vale = Dinheiro.Arredondar(request.SalarioBruto * PercentualVale);
+      decimal liquido = proventos - vale - request.PlanoMedico - request.OutrosDescontos - inss - irrf;
 
       return new HoleriteResponseDTO(
-        double.Round(holeriteRequestDTO.SalarioBruto, 2),
-        double.Round(totalINSS, 2),
-        double.Round(totalIRRF, 2),
-        double.Round(totalAdicionalNoturno, 2),
-        double.Round(totalHorasExtras75, 2),
-        double.Round(totalHorasExtras100, 2),
-        double.Round(totalDSRNoturno, 2),
-        double.Round(totalDSRHoraExtra, 2),
-        double.Round(totalDebitos, 2),
-        double.Round(totalGeral, 2),
-        double.Round(holeriteRequestDTO.PlanoMedico, 2),
-        double.Round(holeriteRequestDTO.OutrosDescontos, 2),
-        double.Round(valorValeAdiantamento, 2)
+        SalarioBruto: Dinheiro.Arredondar(request.SalarioBruto),
+        TotalIRRF: irrf,
+        TotalINSS: inss,
+        TotalAdicionalNoturno: adicionalNoturno,
+        TotalHorasExtras75: horasExtras75,
+        TotalHorasExtras100: horasExtras100,
+        TotalDSRNoturno: dsrNoturno,
+        TotalDSRHoraExtra: dsrHorasExtras,
+        TotalDebitos: Dinheiro.Arredondar(proventos),
+        TotalGeral: Dinheiro.Arredondar(liquido),
+        PlanoMedico: Dinheiro.Arredondar(request.PlanoMedico),
+        OutrosDescontos: Dinheiro.Arredondar(request.OutrosDescontos),
+        ValorValeAdiantamento: vale
       );
     }
 
-    private double CalcularINSS(double salario)
+    private static decimal ParaHoras(string? horario)
     {
-      INSS inss = new(salario) { AliquotasINSS = PopularAliquotasINSS() };
+      if (string.IsNullOrEmpty(horario)) return 0;
 
-      return inss.CalcularINSS();
-    }
-
-    private double CalcularIRRF(double salario, double parcelaINSS)
-    {
-      IRRF irrf = new(salario, parcelaINSS) { AliquotasIRRF = PopularAliquotasIRRF() };
-      return irrf.CalcularIRRF();
-    }
-
-    private AliquotaIRRF[] PopularAliquotasIRRF()
-    {
-      return _IHoleriteRepository.CarregarAliquotasIRRF();
-    }
-
-    private AliquotaINSS[] PopularAliquotasINSS()
-    {
-      return _IHoleriteRepository.CarregarAliquotasINSS();
-    }
-
-    private static double TransformaHoras(string? horario)
-    {
-      var partes = horario?.Split(':') ?? ["00", "00"];
+      string[] partes = horario.Split(':');
       if (partes.Length != 2 || !int.TryParse(partes[0], out int horas) || !int.TryParse(partes[1], out int minutos))
       {
         throw new ArgumentException("Formato de horário inválido. Use o formato HH:mm.", nameof(horario));
       }
-      return horas + minutos / 60.0;
+      return horas + minutos / 60m;
     }
-
   }
 }

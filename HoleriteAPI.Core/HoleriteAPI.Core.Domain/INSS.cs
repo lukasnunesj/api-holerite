@@ -1,38 +1,27 @@
 namespace HoleriteAPI.Core.Domain
 {
-  public class AliquotaINSS
-  {
-    public double De { get; set; }
-    public double Ate { get; set; }
-    public double Aliquota { get; set; }
-  }
-  public class INSS(double salario)
-  {
-    public double Salario { get; private set; } = salario;
-    public AliquotaINSS[] AliquotasINSS { get; set; }
+  public record FaixaINSS(decimal Ate, decimal Aliquota);
 
-    public double CalcularINSS()
+  public static class INSS
+  {
+    /// <summary>
+    /// Contribuição progressiva: cada alíquota incide só sobre a parte do salário dentro da sua faixa.
+    /// O que passa do teto (limite da última faixa) não contribui.
+    /// </summary>
+    public static decimal Calcular(decimal salario, IReadOnlyList<FaixaINSS> faixas)
     {
-      double totalINSS = 0;
+      decimal total = 0;
+      decimal limiteAnterior = 0;
 
-      AliquotaINSS ultimaFaixa = AliquotasINSS.Last();
-
-      Salario = Math.Min(Salario, ultimaFaixa.Ate);
-
-      for (int i = 0; i < AliquotasINSS.Length; i++)
+      foreach (FaixaINSS faixa in faixas)
       {
-        AliquotaINSS faixa = AliquotasINSS[i];
+        if (salario <= limiteAnterior) break;
 
-        double valorFaixa = Math.Min(Salario, faixa.Ate) - (i == 0 ? 0 : AliquotasINSS[i - 1].Ate);
-        totalINSS += valorFaixa * faixa.Aliquota;
-
-        if (Salario <= faixa.Ate)
-        {
-          break;
-        }
+        total += (Math.Min(salario, faixa.Ate) - limiteAnterior) * faixa.Aliquota;
+        limiteAnterior = faixa.Ate;
       }
 
-      return totalINSS;
+      return Dinheiro.Arredondar(total);
     }
   }
 }
