@@ -1,6 +1,6 @@
 @HoleriteAPI.Consumer_HostAddress = http://localhost:5042
 
-GET {{HoleriteAPI.Consumer_HostAddress}}/weatherforecast/
+GET {{HoleriteAPI.Consumer_HostAddress}}/api/holerite?SalarioBruto=3000&HorasNoturnas=10:00&HorasExtras75=02:00&HorasExtras100=00:00&DiasUteis=22&DomingosFeriados=5&PlanoMedico=0&OutrosDescontos=0
 Accept: application/json
 
 ###
