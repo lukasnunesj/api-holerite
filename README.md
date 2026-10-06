@@ -1,6 +1,6 @@
 # HoleriteAPI
 
-[![CI/CD](https://github.com/lukasnunesj/api-hoelerite/actions/workflows/main.yml/badge.svg)](https://github.com/lukasnunesj/api-hoelerite/actions/workflows/main.yml)
+[![CI/CD](https://github.com/lukasnunesj/api-holerite/actions/workflows/main.yml/badge.svg)](https://github.com/lukasnunesj/api-holerite/actions/workflows/main.yml)
 
 API em **C# / .NET 8** que estima o holerite mensal de um empregado CLT: adicional noturno, horas extras, DSR,
 INSS, IRRF, vale/adiantamento e o valor líquido.
